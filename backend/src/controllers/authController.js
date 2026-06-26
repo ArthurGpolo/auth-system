@@ -10,40 +10,34 @@ async function register(req, res) {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
   }
 
-  // if (password.length < 8) {
-  //   return res.status(400).json({ error: 'Senha deve ter no mínimo 8 caracteres.' });
-  // }
-
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ error: 'Email inválido.' });
   }
 
   try {
-    // MySQL usa ? como placeholder (não $1)
     const [existing] = await pool.query(
       'SELECT id FROM users WHERE email = ?',
       [email.toLowerCase()]
     );
 
     if (existing.length > 0) {
-      return res.status(400).json({ error: 'Dados inválidos.' });
+      return res.status(400).json({ error: 'Email já cadastrado.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // No MySQL, INSERT não tem RETURNING — usamos insertId
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-      [name, email.toLowerCase(), hashedPassword]
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email.toLowerCase(), hashedPassword, 'user'] // sempre começa como "user"
     );
 
-    const userId = result.insertId; // ID gerado pelo AUTO_INCREMENT
+    const userId = result.insertId;
 
-    const user = { id: userId, name, email: email.toLowerCase() };
+    const user = { id: userId, name, email: email.toLowerCase(), role: 'user' };
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -70,7 +64,7 @@ async function login(req, res) {
       [email.toLowerCase()]
     );
 
-    const user = rows[0]; // MySQL retorna array de linhas
+    const user = rows[0];
 
     if (!user) {
       return res.status(401).json({ error: 'Email ou senha incorretos.' });
@@ -83,7 +77,7 @@ async function login(req, res) {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -91,7 +85,7 @@ async function login(req, res) {
     return res.json({
       message: 'Login realizado!',
       token,
-      user: { id: user.id, name: user.name, email: user.email }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
 
   } catch (err) {
@@ -103,7 +97,7 @@ async function login(req, res) {
 // ── PERFIL ────────────────────────────────────────────────
 async function getProfile(req, res) {
   const [rows] = await pool.query(
-    'SELECT id, name, email, created_at FROM users WHERE id = ?',
+    'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
     [req.user.id]
   );
 

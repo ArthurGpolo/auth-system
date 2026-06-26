@@ -1,0 +1,92 @@
+.admin-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: #f1f5f9;
+  padding: 40px;
+}
+
+.admin-card {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.admin-card h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #2563eb;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-bottom: 25px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.admin-table th {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 600;
+}
+
+.admin-table tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.role-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role-badge.admin {
+  background: #2563eb;
+  color: white;
+}
+
+.role-badge.user {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 8px;
+  transition: 0.2s;
+}
+
+.btn-admin {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-user {
+  background: #64748b;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}

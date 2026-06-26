@@ -76,6 +76,8 @@ button {
   font-weight: 600;
 
   transition: .2s;
+
+  margin-right: 5px;
 }
 
 button:hover {

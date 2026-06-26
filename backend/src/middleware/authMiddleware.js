@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 function requireAuth(req, res, next) {
-  // O token vem no header: Authorization: Bearer <token>
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -11,11 +10,18 @@ function requireAuth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // injeta os dados do usuário na requisição
-    next();             // libera para a próxima função
+    req.user = decoded;
+    next();
   } catch (err) {
     return res.status(403).json({ error: 'Token inválido ou expirado.' });
   }
 }
 
-module.exports = requireAuth;
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Acesso negado. Apenas admins.' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin };
